@@ -64,10 +64,14 @@ docker-compose up --build
 ```
 The API server will run at **`http://localhost:8001/`**.
 
-### 3. Run Database Migrations
+### 3. Run Database Migrations & Seed Data
 In a second terminal:
 ```bash
+# Apply database migrations
 docker-compose exec web python manage.py migrate
+
+# Seed sample listings (7 realistic property listings across Victoria Island, Ikoyi, Lekki, and Ikeja)
+docker-compose exec web python manage.py seed_listings
 ```
 
 ---
@@ -152,6 +156,7 @@ curl "http://localhost:8001/api/listings/?latitude=6.4281&longitude=3.4219&radiu
 2. **Flat Coordinate API Interface**: The API exposes `latitude` and `longitude` flat fields instead of raw GeoJSON objects, providing a developer-friendly REST interface.
 3. **Database Guardrails**: Price positivity (`price > 0`) is enforced at both the DRF serializer layer and the PostgreSQL database level (`CheckConstraint`).
 4. **UUID Primary Keys**: Prevents sequential ID enumeration attacks and works seamlessly across distributed architectures.
+5. **Rate Limiting & Throttling**: Protected against query abuse with DRF `AnonRateThrottle` (`100 requests/min`) to safeguard spatial calculations from DB starvation.
 
 ---
 
